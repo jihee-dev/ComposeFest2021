@@ -21,10 +21,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import com.codelabs.state.ui.StateCodelabTheme
 
 class TodoActivity : AppCompatActivity() {
-
     val todoViewModel by viewModels<TodoViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,9 +34,29 @@ class TodoActivity : AppCompatActivity() {
         setContent {
             StateCodelabTheme {
                 Surface {
-                    // TODO: build the screen in compose
+                    TodoActivityScreen(todoViewModel = todoViewModel)
                 }
             }
         }
     }
+}
+
+@Composable
+private fun TodoActivityScreen(todoViewModel: TodoViewModel) {
+    // .observeAsState()
+    // : observes a LiveData<T> and converts it into a State<T> object so Compose can react to value changes
+    // by
+    // : the property delegate syntax in Kotlin,
+    // it lets us automatically unwrap the State<List<TodoItem>> from observeAsState into a regular List<TodoItem>
+    // val items: List<TodoItem> by todoViewModel.todoItems.observeAsState(listOf())
+
+    TodoScreen(
+        items = todoViewModel.todoItems,
+        currentlyEditing = todoViewModel.currentEditItem,
+        onAddItem = todoViewModel::addItem,
+        onRemoveItem = todoViewModel::removeItem,
+        onStartEdit = todoViewModel::onEditItemSelected,
+        onEditItemChange = todoViewModel::onEditItemChange,
+        onEditDone = todoViewModel::onEditDone
+    )
 }
